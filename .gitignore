@@ -4,3 +4,8 @@ coverage/
 *.log
 .DS_Store
 .vscode/
+.wxt/
+.output/
+test-results/
+playwright-report/
+apps/extension/tests/.harness/

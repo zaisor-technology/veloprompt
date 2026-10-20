@@ -1,0 +1,4 @@
+body { width: 360px; }
+main { padding: 16px 16px 14px; }
+header { padding-bottom: 12px; }
+.footer { display: grid; gap: 10px; padding-bottom: 0; }
