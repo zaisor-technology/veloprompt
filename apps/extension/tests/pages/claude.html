@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <title>Página de prueba · Claude</title>
+    <style>
+      body { font: 15px/1.6 Georgia, serif; margin: 0; background: #faf9f5; color: #1f1e1d; }
+      main { max-width: 720px; margin: 0 auto; padding: 24px 16px 220px; }
+      .user-message { background: #f0eee6; border-radius: 12px; padding: 8px 14px; margin: 16px 0; white-space: pre-wrap; font-family: system-ui, sans-serif; }
+      .font-claude-response { margin: 16px 0; }
+      fieldset { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%); width: min(720px, calc(100% - 32px)); border: 1px solid #e5e2d9; border-radius: 16px; padding: 14px 60px 14px 16px; background: #fff; margin: 0; font-family: system-ui, sans-serif; }
+      .ProseMirror { outline: none; min-height: 24px; }
+      .ProseMirror p { margin: 0; }
+      button[aria-label="Send message"] { position: absolute; right: 12px; bottom: 12px; width: 34px; height: 34px; border-radius: 9px; border: 0; background: #c96442; color: #fff; cursor: pointer; }
+    </style>
+    <script src="/fake-prosemirror.js"></script>
+  </head>
+  <body>
+    <main id="thread"></main>
+    <fieldset>
+      <div data-testid="chat-input"><div id="editor"></div></div>
+      <button type="button" aria-label="Send message">↑</button>
+    </fieldset>
+    <script>
+      window.__sent = [];
+      const thread = document.getElementById("thread");
+      const editor = FakeProseMirror.createEditor(document.getElementById("editor"), { onSubmit: send });
+      document.querySelector("button[aria-label='Send message']").addEventListener("click", send);
+      function send() {
+        const text = editor.getText();
+        if (!text.trim()) return;
+        window.__sent.push(text);
+        const bubble = document.createElement("div");
+        bubble.className = "user-message";
+        bubble.dataset.testid = "user-message";
+        bubble.textContent = text;
+        thread.append(bubble);
+        editor.clear();
+        if (!location.pathname.startsWith("/chat/")) history.pushState({}, "", "/chat/conv-prueba-2");
+      }
+      window.__reply = async (text) => {
+        const msg = document.createElement("div");
+        msg.className = "font-claude-response";
+        const p = document.createElement("p");
+        msg.append(p);
+        thread.append(msg);
+        await FakeProseMirror.streamInto(p, text);
+      };
+    </script>
+  </body>
+</html>

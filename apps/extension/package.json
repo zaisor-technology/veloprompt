@@ -13,7 +13,7 @@
     "postinstall": "wxt prepare",
     "typecheck": "wxt prepare && tsc --noEmit",
     "test": "vitest run",
-    "test:browser": "pnpm build:e2e && playwright test",
+    "test:browser": "pnpm build:e2e && playwright test --project=adaptadores --project=e2e",
     "screenshots": "pnpm build:e2e && playwright test --project=capturas"
   },
   "dependencies": {

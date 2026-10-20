@@ -3,6 +3,8 @@ import type { SiteAdapter } from "../adapters/types";
 
 export const RESTORED_TITLE = "Dato restaurado por VeloPrompt (la IA nunca lo vio)";
 const LABEL = /\[[A-Z_]+_\d+\]/g;
+/** Sin bandera g: test() no debe mover lastIndex (matchAll lo copiaría). */
+const HAS_LABEL = /\[[A-Z_]+_\d+\]/;
 const STYLE_ID = "veloprompt-style";
 
 const CSS = `
@@ -30,8 +32,7 @@ export function restoreIn(container: HTMLElement, map: RedactionMap): number {
     acceptNode: (node) => {
       const parent = node.parentElement;
       if (!parent || parent.closest(".vp-restored, .vp-copy, textarea, [contenteditable='true']")) return NodeFilter.FILTER_REJECT;
-      LABEL.lastIndex = 0;
-      return LABEL.test((node as Text).data) ? NodeFilter.FILTER_ACCEPT : NodeFilter.FILTER_REJECT;
+      return HAS_LABEL.test((node as Text).data) ? NodeFilter.FILTER_ACCEPT : NodeFilter.FILTER_REJECT;
     },
   });
   const targets: Text[] = [];

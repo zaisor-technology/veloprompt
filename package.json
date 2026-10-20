@@ -14,7 +14,8 @@
     "typecheck": "pnpm -r typecheck",
     "test": "pnpm -r test",
     "coverage": "pnpm -r coverage",
-    "bench": "pnpm -r bench"
+    "bench": "pnpm -r bench",
+    "test:browser": "pnpm --filter veloprompt-extension test:browser"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",

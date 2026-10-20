@@ -12,6 +12,14 @@ export default tseslint.config(
     },
   },
   {
+    // Páginas de prueba: scripts clásicos de navegador.
+    files: ["apps/extension/tests/pages/**/*.js"],
+    languageOptions: {
+      sourceType: "script",
+      globals: { window: "readonly", document: "readonly", NodeFilter: "readonly", setTimeout: "readonly" },
+    },
+  },
+  {
     rules: {
       "@typescript-eslint/no-unused-vars": ["error", { argsIgnorePattern: "^_" }],
     },

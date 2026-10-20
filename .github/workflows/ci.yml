@@ -23,3 +23,25 @@ jobs:
       - run: pnpm typecheck
       - run: pnpm test
       - run: pnpm build
+
+  browser:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm --filter veloprompt-extension exec playwright install --with-deps chromium
+      # Adaptadores y E2E con la extensión cargada, sobre páginas de prueba locales (nunca las webs reales).
+      - run: pnpm test:browser
+        env:
+          CI: "true"
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: playwright-report
+          path: apps/extension/playwright-report
+          retention-days: 7
