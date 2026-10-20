@@ -1,6 +1,6 @@
 {
   "name": "veloprompt-extension",
-  "version": "0.2.0",
+  "version": "1.0.0",
   "private": true,
   "description": "Extensión de navegador de VeloPrompt: tapa datos sensibles antes de enviarlos a la IA.",
   "license": "MIT",
@@ -14,7 +14,8 @@
     "typecheck": "wxt prepare && tsc --noEmit",
     "test": "vitest run",
     "test:browser": "pnpm build:e2e && playwright test --project=adaptadores --project=e2e",
-    "screenshots": "pnpm build:e2e && playwright test --project=capturas"
+    "screenshots": "pnpm build:e2e && playwright test --project=capturas",
+    "store:images": "pnpm build:e2e && playwright test --project=tienda"
   },
   "dependencies": {
     "veloprompt-core": "workspace:*"

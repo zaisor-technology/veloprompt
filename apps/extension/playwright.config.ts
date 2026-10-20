@@ -21,5 +21,7 @@ export default defineConfig({
     { name: "e2e", testMatch: "extension.spec.ts" },
     // Solo bajo demanda (pnpm screenshots): genera docs/capturas/*.png.
     { name: "capturas", testMatch: "screenshots.spec.ts" },
+    // Solo bajo demanda (pnpm store:images): imágenes de la Chrome Web Store en /store/imagenes.
+    { name: "tienda", testMatch: "store.spec.ts" },
   ],
 });
