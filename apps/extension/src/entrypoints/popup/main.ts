@@ -2,7 +2,8 @@ import { browser } from "wxt/browser";
 import "../../ui/panel.css";
 import "./popup.css";
 import { countriesSection, h, sitesSection, statsSection, teamLink } from "../../ui/controls";
-import { SITES, type Settings, type SiteId } from "../../lib/settings";
+import type { Settings, SiteId } from "../../lib/settings";
+import { siteForHost } from "../../lib/sites";
 import { loadSettings, loadStats, saveSettings, watchStats } from "../../lib/storage";
 import type { WeeklyStats } from "../../lib/stats";
 
@@ -12,7 +13,7 @@ async function currentSite(): Promise<SiteId | null> {
   try {
     const [tab] = await browser.tabs.query({ active: true, currentWindow: true });
     const host = tab?.url ? new URL(tab.url).hostname : "";
-    return SITES.find((s) => host === s.host)?.id ?? null;
+    return siteForHost(host)?.id ?? null;
   } catch {
     return null;
   }

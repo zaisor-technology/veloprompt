@@ -1,12 +1,9 @@
 import { COUNTRIES, DATA_TYPES } from "veloprompt-core";
 import type { Country, DataType, DetectOptions } from "veloprompt-core";
 
-export type SiteId = "chatgpt" | "claude";
+import { SITES, type SiteId } from "./sites";
 
-export const SITES: readonly { id: SiteId; name: string; host: string }[] = [
-  { id: "chatgpt", name: "ChatGPT", host: "chatgpt.com" },
-  { id: "claude", name: "Claude", host: "claude.ai" },
-];
+export { SITES, type SiteId } from "./sites";
 
 export interface Settings {
   sites: Record<SiteId, boolean>;
@@ -16,7 +13,7 @@ export interface Settings {
 }
 
 export const DEFAULT_SETTINGS: Settings = {
-  sites: { chatgpt: true, claude: true },
+  sites: Object.fromEntries(SITES.map((s) => [s.id, true])) as Record<SiteId, boolean>,
   countries: [...COUNTRIES],
   types: [...DATA_TYPES],
   customTerms: [],

@@ -49,7 +49,6 @@ export function sitesSection(settings: Settings, onChange: (s: Settings) => void
       ),
     );
   }
-  section.append(h("p", { className: "muted" }, "Gemini, Copilot, Perplexity y DeepSeek: próximamente."));
   return section;
 }
 

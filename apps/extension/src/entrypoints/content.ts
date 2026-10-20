@@ -2,13 +2,14 @@ import { applyRedaction, detect, type Finding } from "veloprompt-core";
 import { pickAdapter } from "../adapters";
 import { insertText, isInternalPaste, saveSelection } from "../adapters/editor";
 import { ConversationSessions } from "../lib/sessions";
+import { MATCHES } from "../lib/sites";
 import { DEFAULT_SETTINGS, toDetectOptions, type Settings } from "../lib/settings";
 import { loadSettings, recordAvoided, watchSettings } from "../lib/storage";
 import { showNotice } from "../ui/notice";
 import { startRestorer } from "../ui/restorer";
 
 export default defineContentScript({
-  matches: ["https://chatgpt.com/*", "https://claude.ai/*"],
+  matches: MATCHES,
   runAt: "document_idle",
   async main() {
     const adapter = pickAdapter(location, import.meta.env.VP_E2E);
