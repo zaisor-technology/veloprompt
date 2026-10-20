@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { createSession, redact, restore } from "../src/index.js";
+import { applyRedaction, createSession, detect, redact, restore } from "../src/index.js";
 import { ecCedula, esDni } from "./generators.js";
 
 describe("redact / restore", () => {
@@ -46,5 +46,13 @@ describe("redact / restore", () => {
   it("texto vacío o sin datos", () => {
     expect(redact("")).toEqual({ text: "", map: {}, findings: [] });
     expect(redact("hola mundo").text).toBe("hola mundo");
+  });
+
+  it("applyRedaction tapa solo los hallazgos elegidos", () => {
+    const text = "DNI 12345678Z y correo a@b.co";
+    const session = createSession();
+    const chosen = detect(text).filter((f) => f.type === "EMAIL");
+    expect(applyRedaction(text, chosen, session)).toBe("DNI 12345678Z y correo [EMAIL_1]");
+    expect(session.map).toEqual({ "[EMAIL_1]": "a@b.co" });
   });
 });

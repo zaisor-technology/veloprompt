@@ -96,4 +96,11 @@ describe("opciones", () => {
     const [f] = detect("correo ana@example.com", { customTerms: ["ana@example.com"] });
     expect(f).toMatchObject({ type: "PRIVADO", value: "ana@example.com" });
   });
+
+  it("marca como dudoso el dato que encaja en dos tipos con la misma confianza", () => {
+    const [f] = detect("cédula/DNI 30.123.456", { countries: ["CO", "AR"] });
+    expect(f).toMatchObject({ value: "30.123.456", ambiguous: true });
+    expect([f!.type, ...f!.alternatives!].sort()).toEqual(["CEDULA", "DNI"]);
+    expect(detect("DNI 12345678Z")[0]!.ambiguous).toBeUndefined();
+  });
 });

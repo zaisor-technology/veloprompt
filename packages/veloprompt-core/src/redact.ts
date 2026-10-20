@@ -57,14 +57,22 @@ export interface RedactResult {
 export function redact(text: string, options: RedactOptions = {}): RedactResult {
   const session = options.session ?? new RedactionSession();
   const findings = detect(text, options);
+  return { text: applyRedaction(text, findings, session), map: session.map, findings };
+}
+
+/**
+ * Sustituye solo los hallazgos indicados (p. ej. los que el usuario marcó en una lista).
+ * Deben venir de `detect(text)` sobre ese mismo texto y no solaparse.
+ */
+export function applyRedaction(text: string, findings: readonly Finding[], session: RedactionSession): string {
   let out = "";
   let cursor = 0;
-  for (const f of findings) {
+  for (const f of [...findings].sort((a, b) => a.start - b.start)) {
+    if (f.start < cursor) continue;
     out += text.slice(cursor, f.start) + session.labelFor(f.type, f.value);
     cursor = f.end;
   }
-  out += text.slice(cursor);
-  return { text: out, map: session.map, findings };
+  return out + text.slice(cursor);
 }
 
 /** Vuelve a poner los valores reales en lugar de las etiquetas conocidas por `map`. */

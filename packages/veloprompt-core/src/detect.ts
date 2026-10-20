@@ -1,6 +1,6 @@
 import { RULES } from "./rules/index.js";
 import { hasContext, looksLikeNonPersonalNumber } from "./text.js";
-import type { DetectOptions, Finding, Rule } from "./types.js";
+import type { DataType, DetectOptions, Finding, Rule } from "./types.js";
 
 interface Candidate extends Finding {
   priority: number;
@@ -85,11 +85,22 @@ function resolveOverlaps(candidates: Candidate[]): Finding[] {
       a.start - b.start,
   );
   const accepted: Candidate[] = [];
+  const rivals = new Map<Candidate, Set<DataType>>();
   for (const c of candidates) {
-    if (accepted.every((a) => c.end <= a.start || c.start >= a.end)) accepted.push(c);
+    const winner = accepted.find((a) => c.end > a.start && c.start < a.end);
+    if (!winner) {
+      accepted.push(c);
+    } else if (c.type !== winner.type && c.start === winner.start && c.end === winner.end && c.confidence === winner.confidence) {
+      const set = rivals.get(winner) ?? new Set<DataType>();
+      set.add(c.type);
+      rivals.set(winner, set);
+    }
   }
   accepted.sort((a, b) => a.start - b.start);
-  return accepted.map(({ priority: _p, withContext: _w, ...finding }) => finding);
+  return accepted.map(({ priority: _p, withContext: _w, ...finding }, i) => {
+    const alt = rivals.get(accepted[i]!);
+    return alt ? { ...finding, ambiguous: true, alternatives: [...alt] } : finding;
+  });
 }
 
 /** Detecta datos sensibles en `text`. No modifica el texto ni hace llamadas de red. */

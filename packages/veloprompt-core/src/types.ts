@@ -66,6 +66,13 @@ export interface Finding {
   confidence: number;
   /** Identificador de la regla que produjo el hallazgo (p. ej. `ec.cedula`). */
   rule: string;
+  /**
+   * `true` si otra regla de distinto tipo encajaba en el mismo tramo con la misma confianza
+   * (p. ej. "cédula/DNI 30.123.456"). La interfaz puede mostrarlo como "Dato personal".
+   */
+  ambiguous?: boolean;
+  /** Tipos alternativos cuando `ambiguous` es `true`. */
+  alternatives?: DataType[];
 }
 
 export interface DetectOptions {
