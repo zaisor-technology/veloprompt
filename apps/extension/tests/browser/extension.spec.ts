@@ -19,10 +19,11 @@ const CHATGPT = { url: "/chatgpt.html", editor: "#prompt-textarea", send: "#comp
 const CLAUDE = { url: "/claude.html", editor: "[data-testid='chat-input'] .ProseMirror", send: "button[aria-label='Send message']", response: ".font-claude-response" };
 
 const sent = (page: Page) => page.evaluate(() => (window as any).__sent as string[]);
-const editorText = (page: Page, sel: string) => page.locator(sel).evaluate((el) => (el as HTMLElement).innerText.trim());
+const editorText = (page: Page, sel: string) =>
+  page.locator(sel).evaluate((el) => (el instanceof HTMLTextAreaElement ? el.value : (el as HTMLElement).innerText).trim());
 const reply = (page: Page, text: string) => page.evaluate((t) => (window as any).__reply(t), text);
 
-async function open(page: Page, site: typeof CHATGPT): Promise<void> {
+async function open(page: Page, site: { url: string }): Promise<void> {
   await page.goto(site.url);
   // El content script se inyecta en document_idle: esperamos a que marque la página.
   await expect(page.locator("#veloprompt-style")).toHaveCount(1);
@@ -192,3 +193,43 @@ test.describe("Claude (página de prueba)", () => {
     await expect.poll(() => sent(page)).toEqual(["clave [CLAVE_API_1] y contraseña: [CONTRASENA_1]"]);
   });
 });
+
+const NEW_SITES = [
+  { name: "Gemini (Quill)", url: "/gemini.html", editor: "rich-textarea .ql-editor", send: "button.send-button", response: "model-response message-content", conv: /\/app\/conv-gemini-1$/ },
+  { name: "Copilot (textarea)", url: "/copilot.html", editor: "textarea#userInput", send: "[data-testid='submit-button']", response: "[data-content='ai-message']", conv: /\/chats\/conv-copilot-1$/ },
+  { name: "Perplexity (Lexical)", url: "/perplexity.html", editor: "#ask-input", send: "button[aria-label='Submit']", response: "[id^='markdown-content-']", conv: /\/search\/conv-perplexity-1$/ },
+  { name: "DeepSeek (textarea)", url: "/deepseek.html", editor: "textarea#chat-input", send: "._send", response: ".ds-markdown", conv: /\/a\/chat\/s\/conv-deepseek-1$/ },
+];
+
+for (const site of NEW_SITES) {
+  test.describe(`${site.name} (página de prueba)`, () => {
+    test("pegar → tapar → enviar con el botón → restaurar la respuesta", async ({ page, requests }) => {
+      await open(page, site);
+      await paste(page, site.editor, `Mi cédula es ${CEDULA} y mi NIF ${NIF}`);
+      await expect(notice(page).locator("mark small")).toHaveText(["Cédula (EC)", "DNI/NIF (ES)"]);
+      await page.keyboard.press("Enter"); // Tapar todo
+      await expect.poll(() => editorText(page, site.editor)).toBe("Mi cédula es [CEDULA_1] y mi NIF [NIF_1]");
+
+      await page.locator(site.send).click();
+      await expect.poll(() => sent(page)).toEqual(["Mi cédula es [CEDULA_1] y mi NIF [NIF_1]"]);
+      await expect(page).toHaveURL(site.conv);
+
+      await reply(page, "Registrado: [CEDULA_1] / [NIF_1].");
+      await expect(page.locator(site.response)).toHaveText(`Registrado: ${CEDULA} / ${NIF}.`);
+      await expect(page.locator(".vp-restored")).toHaveCount(2);
+      await expect(page.getByRole("button", { name: "Copiar con datos reales" })).toHaveCount(1);
+      expect(requests.filter((u) => !u.startsWith("http://127.0.0.1:4173/") && !u.startsWith("chrome-extension://"))).toEqual([]);
+    });
+
+    test("datos escritos a mano: aviso al pulsar Enter", async ({ page }) => {
+      await open(page, site);
+      await page.locator(site.editor).click();
+      await page.keyboard.type(`correo ana@example.com, NIF ${NIF}`);
+      await page.keyboard.press("Enter");
+      await expect(notice(page).getByText("Tu mensaje contiene 2 datos sensibles")).toBeVisible();
+      expect(await sent(page)).toEqual([]);
+      await notice(page).getByRole("button", { name: "Tapar todo" }).click();
+      await expect.poll(() => sent(page)).toEqual(["correo [EMAIL_1], NIF [NIF_1]"]);
+    });
+  });
+}

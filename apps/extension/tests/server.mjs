@@ -7,15 +7,20 @@ const ROOT = join(import.meta.dirname, "pages");
 const HARNESS = join(import.meta.dirname, ".harness");
 const TYPES = { ".html": "text/html; charset=utf-8", ".js": "text/javascript; charset=utf-8" };
 const PORT = 4173;
+// Las rutas de conversación sirven la misma página, como una SPA.
+const ROUTES = [
+  ["/c/", "chatgpt.html"],
+  ["/chat/", "claude.html"],
+  ["/app/", "gemini.html"],
+  ["/chats/", "copilot.html"],
+  ["/search/", "perplexity.html"],
+  ["/a/chat/s/", "deepseek.html"],
+];
 
 createServer(async (req, res) => {
   const path = new URL(req.url ?? "/", "http://x").pathname;
-  // Las rutas de conversación (/c/…, /chat/…) sirven la misma página, como una SPA.
-  const file = path.startsWith("/c/")
-    ? "chatgpt.html"
-    : path.startsWith("/chat/")
-      ? "claude.html"
-      : path.slice(1) || "chatgpt.html";
+  const route = ROUTES.find(([prefix]) => path.startsWith(prefix));
+  const file = route ? route[1] : path.slice(1) || "chatgpt.html";
   const base = file.startsWith("harness") ? HARNESS : ROOT;
   try {
     const body = await readFile(join(base, file.replace(/\.\./g, "")));

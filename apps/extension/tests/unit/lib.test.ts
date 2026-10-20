@@ -4,6 +4,7 @@ import { findingName, typeName } from "../../src/lib/labels";
 import { buildPreview } from "../../src/lib/preview";
 import { ConversationSessions } from "../../src/lib/sessions";
 import { DEFAULT_SETTINGS, parseTerms, sanitizeSettings, toDetectOptions } from "../../src/lib/settings";
+import { MATCHES, siteForHost } from "../../src/lib/sites";
 import { addToStats, currentWeek, isoWeek, total } from "../../src/lib/stats";
 
 describe("semana ISO", () => {
@@ -37,9 +38,15 @@ describe("estadísticas semanales", () => {
 });
 
 describe("ajustes", () => {
-  it("por defecto: los dos sitios, los 7 países y todos los tipos", () => {
+  it("por defecto: los 6 sitios activos, los 7 países y todos los tipos", () => {
     expect(sanitizeSettings(undefined)).toEqual(DEFAULT_SETTINGS);
+    expect(Object.values(DEFAULT_SETTINGS.sites)).toEqual([true, true, true, true, true, true]);
     expect(DEFAULT_SETTINGS.countries).toHaveLength(7);
+  });
+
+  it("ajustes guardados en la semana 2 (solo ChatGPT y Claude): los sitios nuevos quedan activos", () => {
+    const s = sanitizeSettings({ sites: { chatgpt: false, claude: true } });
+    expect(s.sites).toEqual({ chatgpt: false, claude: true, gemini: true, copilot: true, perplexity: true, deepseek: true });
   });
 
   it("filtra valores desconocidos y conserva los válidos", () => {
@@ -49,7 +56,12 @@ describe("ajustes", () => {
       types: ["EMAIL", "NOPE"],
       customTerms: ["  Acme ", "", "Acme", 3],
     });
-    expect(s).toEqual({ sites: { chatgpt: false, claude: true }, countries: ["EC", "ES"], types: ["EMAIL"], customTerms: ["Acme"] });
+    expect(s).toEqual({
+      sites: { ...DEFAULT_SETTINGS.sites, chatgpt: false },
+      countries: ["EC", "ES"],
+      types: ["EMAIL"],
+      customTerms: ["Acme"],
+    });
   });
 
   it("parseTerms: una línea por término", () => {
@@ -115,5 +127,25 @@ describe("sesiones por conversación", () => {
     const s = createSession();
     expect(s.labelFor("CEDULA", "1710034065")).toBe("[CEDULA_1]");
     expect(s.labelFor("CEDULA", "1710034065")).toBe("[CEDULA_1]");
+  });
+});
+
+describe("sitios y manifiesto", () => {
+  it("solo HTTPS y solo los dominios de los 6 chats, sin comodines", () => {
+    expect(MATCHES).toEqual([
+      "https://chatgpt.com/*",
+      "https://claude.ai/*",
+      "https://gemini.google.com/*",
+      "https://copilot.microsoft.com/*",
+      "https://www.perplexity.ai/*",
+      "https://perplexity.ai/*",
+      "https://chat.deepseek.com/*",
+    ]);
+  });
+
+  it("siteForHost no acepta subdominios ni dominios parecidos", () => {
+    expect(siteForHost("gemini.google.com")?.id).toBe("gemini");
+    expect(siteForHost("google.com")).toBeNull();
+    expect(siteForHost("chatgpt.com.evil.example")).toBeNull();
   });
 });

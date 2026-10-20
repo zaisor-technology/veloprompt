@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <title>Página de prueba · Perplexity</title>
+    <style>
+      body { font: 16px/1.6 system-ui, sans-serif; margin: 0; background: #fcfcf9; color: #13343b; }
+      main { max-width: 760px; margin: 0 auto; padding: 24px 16px 220px; }
+      h1.query { font-size: 24px; font-weight: 500; margin: 24px 0 8px; white-space: pre-wrap; }
+      .prose { margin: 8px 0 24px; }
+      .ask { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%); width: min(760px, calc(100% - 32px)); background: #fff; border: 1px solid #e3e3dc; border-radius: 16px; padding: 14px 64px 14px 18px; }
+      #ask-input { outline: none; min-height: 24px; }
+      #ask-input p { margin: 0; }
+      button[aria-label="Submit"] { position: absolute; right: 12px; bottom: 10px; width: 36px; height: 36px; border-radius: 10px; border: 0; background: #20808d; color: #fff; cursor: pointer; }
+    </style>
+    <script src="/fake-prosemirror.js"></script>
+  </head>
+  <body>
+    <main id="thread"></main>
+    <div class="ask">
+      <div id="ask-input"></div>
+      <button type="button" aria-label="Submit" data-testid="submit-button">→</button>
+    </div>
+    <script>
+      window.__sent = [];
+      let n = 0;
+      const thread = document.getElementById("thread");
+      const editor = FakeProseMirror.createEditor(document.getElementById("ask-input"), { onSubmit: send, flavor: "lexical" });
+      document.querySelector("button[aria-label='Submit']").addEventListener("click", send);
+      function send() {
+        const text = editor.getText();
+        if (!text.trim()) return;
+        window.__sent.push(text);
+        const h = document.createElement("h1");
+        h.className = "query";
+        h.textContent = text;
+        thread.append(h);
+        editor.clear();
+        if (!location.pathname.startsWith("/search/")) history.pushState({}, "", "/search/conv-perplexity-1");
+      }
+      window.__reply = async (text) => {
+        const d = document.createElement("div");
+        d.id = `markdown-content-${n++}`;
+        d.className = "prose";
+        const p = document.createElement("p");
+        d.append(p);
+        thread.append(d);
+        await FakeProseMirror.streamInto(p, text);
+      };
+    </script>
+  </body>
+</html>

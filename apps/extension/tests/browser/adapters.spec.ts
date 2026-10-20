@@ -6,6 +6,10 @@ declare const VP: any;
 const SITES = [
   { name: "chatgpt", adapter: "chatgptAdapter", url: "/chatgpt.html", editor: "#prompt-textarea", send: "#composer-submit-button", conv: "c:conv-prueba-1" },
   { name: "claude", adapter: "claudeAdapter", url: "/claude.html", editor: "[data-testid='chat-input'] .ProseMirror", send: "button[aria-label='Send message']", conv: "chat:conv-prueba-2" },
+  { name: "gemini (Quill)", adapter: "geminiAdapter", url: "/gemini.html", editor: "rich-textarea .ql-editor", send: "button.send-button", conv: "app:conv-gemini-1" },
+  { name: "copilot (textarea)", adapter: "copilotAdapter", url: "/copilot.html", editor: "textarea#userInput", send: "[data-testid='submit-button']", conv: "chats:conv-copilot-1" },
+  { name: "perplexity (Lexical)", adapter: "perplexityAdapter", url: "/perplexity.html", editor: "#ask-input", send: "button[aria-label='Submit']", conv: "search:conv-perplexity-1" },
+  { name: "deepseek (textarea)", adapter: "deepseekAdapter", url: "/deepseek.html", editor: "textarea#chat-input", send: "._send", conv: "s:conv-deepseek-1" },
 ] as const;
 
 const sent = (page: Page) => page.evaluate(() => (window as any).__sent as string[]);
@@ -20,8 +24,8 @@ for (const site of SITES) {
       await page.addScriptTag({ url: "/harness.js" });
     });
 
-    test("getEditor encuentra el editor ProseMirror", async ({ page }) => {
-      expect(await page.evaluate((a) => VP[a].getEditor()?.matches(".ProseMirror[contenteditable='true']"), site.adapter)).toBe(true);
+    test("getEditor encuentra el editor de la página", async ({ page }) => {
+      expect(await page.evaluate(([a, sel]) => VP[a].getEditor() === document.querySelector(sel), [site.adapter, site.editor] as const)).toBe(true);
     });
 
     test("getText lee párrafos separados por salto de línea", async ({ page }) => {
@@ -127,15 +131,34 @@ for (const site of SITES) {
   });
 }
 
+test("deepseek: los interruptores DeepThink y Buscar no cuentan como enviar", async ({ page }) => {
+  await page.goto("/deepseek.html");
+  await page.addScriptTag({ url: "/harness.js" });
+  await page.evaluate(() => {
+    (window as any).__calls = 0;
+    VP.deepseekAdapter.onSend(() => (window as any).__calls++);
+  });
+  await page.getByText("DeepThink (R1)").click();
+  await page.getByText("Buscar").click();
+  expect(await page.evaluate(() => (window as any).__calls)).toBe(0);
+  await page.locator("._send").click();
+  expect(await page.evaluate(() => (window as any).__calls)).toBe(1);
+});
+
 test("pickAdapter elige por dominio y solo usa rutas locales en modo test", async ({ page }) => {
   await page.goto("/chatgpt.html");
   await page.addScriptTag({ url: "/harness.js" });
   const ids = await page.evaluate(() => [
     VP.pickAdapter({ hostname: "chatgpt.com", pathname: "/" })?.id,
     VP.pickAdapter({ hostname: "claude.ai", pathname: "/new" })?.id,
-    VP.pickAdapter({ hostname: "gemini.google.com", pathname: "/" })?.id ?? null,
+    VP.pickAdapter({ hostname: "gemini.google.com", pathname: "/app" })?.id,
+    VP.pickAdapter({ hostname: "copilot.microsoft.com", pathname: "/" })?.id,
+    VP.pickAdapter({ hostname: "www.perplexity.ai", pathname: "/" })?.id,
+    VP.pickAdapter({ hostname: "perplexity.ai", pathname: "/" })?.id,
+    VP.pickAdapter({ hostname: "chat.deepseek.com", pathname: "/" })?.id,
+    VP.pickAdapter({ hostname: "example.com", pathname: "/" })?.id ?? null,
     VP.pickAdapter({ hostname: "127.0.0.1", pathname: "/chatgpt.html" })?.id ?? null,
     VP.pickAdapter({ hostname: "127.0.0.1", pathname: "/claude.html" }, true)?.id,
   ]);
-  expect(ids).toEqual(["chatgpt", "claude", null, null, "claude"]);
+  expect(ids).toEqual(["chatgpt", "claude", "gemini", "copilot", "perplexity", "perplexity", "deepseek", null, null, "claude"]);
 });

@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <title>Página de prueba · Copilot</title>
+    <style>
+      body { font: 16px/1.55 "Segoe UI", system-ui, sans-serif; margin: 0; background: #f7f5f2; color: #1b1a19; }
+      main { max-width: 740px; margin: 0 auto; padding: 24px 16px 220px; }
+      [data-content="user-message"] { background: #fff; border-radius: 16px; padding: 10px 16px; margin: 16px 0 16px auto; width: fit-content; max-width: 70%; white-space: pre-wrap; }
+      [data-content="ai-message"] { margin: 16px 0; }
+      .composer { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%); width: min(740px, calc(100% - 32px)); background: #fff; border-radius: 24px; padding: 14px 64px 14px 18px; box-shadow: 0 2px 10px rgba(0,0,0,.08); }
+      textarea { width: 100%; border: 0; outline: none; resize: none; font: inherit; background: transparent; }
+      button[data-testid="submit-button"] { position: absolute; right: 12px; bottom: 12px; width: 38px; height: 38px; border-radius: 50%; border: 0; background: #1b1a19; color: #fff; cursor: pointer; }
+    </style>
+    <script src="/fake-prosemirror.js"></script>
+  </head>
+  <body>
+    <main id="thread"></main>
+    <div class="composer">
+      <textarea id="userInput" rows="2" placeholder="Mensaje a Copilot"></textarea>
+      <button data-testid="submit-button" type="button" aria-label="Enviar mensaje">↑</button>
+    </div>
+    <script>
+      window.__sent = [];
+      const thread = document.getElementById("thread");
+      const editor = FakeProseMirror.createTextarea(document.getElementById("userInput"), { onSubmit: send });
+      document.querySelector("[data-testid='submit-button']").addEventListener("click", send);
+      function send() {
+        const text = editor.getText();
+        if (!text.trim()) return;
+        window.__sent.push(text);
+        const u = document.createElement("div");
+        u.dataset.content = "user-message";
+        u.textContent = text;
+        thread.append(u);
+        editor.clear();
+        if (!location.pathname.startsWith("/chats/")) history.pushState({}, "", "/chats/conv-copilot-1");
+      }
+      window.__reply = async (text) => {
+        const m = document.createElement("div");
+        m.dataset.content = "ai-message";
+        const p = document.createElement("p");
+        m.append(p);
+        thread.append(m);
+        await FakeProseMirror.streamInto(p, text);
+      };
+    </script>
+  </body>
+</html>

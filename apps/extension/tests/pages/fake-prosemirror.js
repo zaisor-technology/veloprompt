@@ -12,10 +12,15 @@
       .join("");
   }
 
-  function createEditor(root, { onSubmit }) {
+  /**
+   * flavor: "prosemirror" (ChatGPT, Claude), "quill" (Gemini) o "lexical" (Perplexity).
+   * Cambia cómo se dibuja cada párrafo, igual que en las webs reales.
+   */
+  function createEditor(root, { onSubmit, flavor = "prosemirror" }) {
     const state = { paragraphs: [""] };
     root.contentEditable = "true";
-    root.classList.add("ProseMirror");
+    root.classList.add(flavor === "quill" ? "ql-editor" : flavor === "lexical" ? "lexical-editor" : "ProseMirror");
+    if (flavor === "lexical") root.dataset.lexicalEditor = "true";
     root.setAttribute("role", "textbox");
     root.setAttribute("translate", "no");
 
@@ -61,7 +66,7 @@
         const len = textOf(p).length;
         if (offset <= acc + len) {
           const range = document.createRange();
-          const t = p.firstChild && p.firstChild.nodeType === 3 ? p.firstChild : null;
+          const t = document.createTreeWalker(p, NodeFilter.SHOW_TEXT).nextNode();
           if (t) range.setStart(t, offset - acc);
           else range.setStart(p, 0);
           range.collapse(true);
@@ -78,10 +83,16 @@
       root.replaceChildren(
         ...state.paragraphs.map((t) => {
           const p = document.createElement("p");
-          if (t) p.append(document.createTextNode(t));
-          else {
+          if (t && flavor === "lexical") {
+            const span = document.createElement("span");
+            span.dataset.lexicalText = "true";
+            span.append(document.createTextNode(t));
+            p.append(span);
+          } else if (t) {
+            p.append(document.createTextNode(t));
+          } else {
             const br = document.createElement("br");
-            br.className = "ProseMirror-trailingBreak";
+            if (flavor === "prosemirror") br.className = "ProseMirror-trailingBreak";
             p.append(br);
           }
           return p;
@@ -131,6 +142,30 @@
     };
   }
 
+  /**
+   * Imitación de un textarea controlado por React (Copilot, DeepSeek): el estado solo cambia con
+   * eventos input. Cambiar .value sin evento deja el estado viejo, y se enviaría ese estado.
+   */
+  function createTextarea(el, { onSubmit }) {
+    const state = { value: el.value };
+    el.addEventListener("input", () => {
+      state.value = el.value;
+    });
+    el.addEventListener("keydown", (e) => {
+      if (e.key === "Enter" && !e.shiftKey) {
+        e.preventDefault();
+        onSubmit();
+      }
+    });
+    return {
+      getText: () => state.value,
+      clear() {
+        el.value = "";
+        state.value = "";
+      },
+    };
+  }
+
   /** Simula una respuesta en streaming: el texto llega en trozos, también a mitad de etiqueta. */
   function streamInto(el, text, chunk = 7, delay = 15) {
     return new Promise((resolve) => {
@@ -146,5 +181,5 @@
     });
   }
 
-  window.FakeProseMirror = { createEditor, streamInto };
+  window.FakeProseMirror = { createEditor, createTextarea, streamInto };
 })();

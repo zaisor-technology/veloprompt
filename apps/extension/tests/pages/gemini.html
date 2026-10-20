@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <title>Página de prueba · Gemini</title>
+    <style>
+      body { font: 16px/1.6 "Google Sans", system-ui, sans-serif; margin: 0; background: #fff; color: #1f1f1f; }
+      main { max-width: 760px; margin: 0 auto; padding: 24px 16px 220px; }
+      user-query { display: block; background: #e9eef6; border-radius: 18px; padding: 10px 16px; margin: 16px 0 16px auto; width: fit-content; max-width: 70%; white-space: pre-wrap; }
+      model-response { display: block; margin: 16px 0; }
+      .input-area { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%); width: min(760px, calc(100% - 32px)); background: #f0f4f9; border-radius: 28px; padding: 14px 64px 14px 22px; }
+      rich-textarea { display: block; }
+      .ql-editor { outline: none; min-height: 24px; }
+      .ql-editor p { margin: 0; }
+      button.send-button { position: absolute; right: 12px; bottom: 10px; width: 40px; height: 40px; border-radius: 50%; border: 0; background: #0b57d0; color: #fff; cursor: pointer; }
+    </style>
+    <script src="/fake-prosemirror.js"></script>
+  </head>
+  <body>
+    <main id="thread"></main>
+    <div class="input-area">
+      <rich-textarea><div id="editor"></div></rich-textarea>
+      <button class="send-button" type="button" aria-label="Enviar mensaje">➤</button>
+    </div>
+    <script>
+      window.__sent = [];
+      const thread = document.getElementById("thread");
+      const editor = FakeProseMirror.createEditor(document.getElementById("editor"), { onSubmit: send, flavor: "quill" });
+      document.querySelector("button.send-button").addEventListener("click", send);
+      function send() {
+        const text = editor.getText();
+        if (!text.trim()) return;
+        window.__sent.push(text);
+        const q = document.createElement("user-query");
+        q.textContent = text;
+        thread.append(q);
+        editor.clear();
+        if (!location.pathname.startsWith("/app/")) history.pushState({}, "", "/app/conv-gemini-1");
+      }
+      window.__reply = async (text) => {
+        const r = document.createElement("model-response");
+        const c = document.createElement("message-content");
+        const md = document.createElement("div");
+        md.className = "markdown";
+        const p = document.createElement("p");
+        md.append(p);
+        c.append(md);
+        r.append(c);
+        thread.append(r);
+        await FakeProseMirror.streamInto(p, text);
+      };
+    </script>
+  </body>
+</html>
