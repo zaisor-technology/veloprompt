@@ -11,14 +11,14 @@ Todo ocurre en tu navegador: **sin servidor, sin telemetría y sin llamadas de r
 
 Web: [zaisor.io/veloprompt](https://zaisor.io/veloprompt)
 
-> Estado: semana 1. Ya está el motor de detección (`veloprompt-core`). La extensión llega en la semana 2.
+> Estado: semana 2. Motor de detección (`veloprompt-core`) y extensión para ChatGPT y Claude ([`apps/extension`](apps/extension/README.md)). Gemini, Copilot, Perplexity y DeepSeek llegan en la semana 3.
 
 ## Estructura
 
 | Ruta | Contenido |
 | --- | --- |
 | [`packages/veloprompt-core`](packages/veloprompt-core) | Motor de detección y anonimización. TypeScript puro, ESM, sin dependencias en runtime. |
-| [`apps/extension`](apps/extension) | Extensión de navegador (próximamente, con WXT). |
+| [`apps/extension`](apps/extension) | Extensión MV3 para Chrome y Edge (WXT): ChatGPT y Claude. |
 
 ## Uso del motor
 
