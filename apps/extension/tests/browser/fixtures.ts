@@ -20,6 +20,7 @@ export const test = base.extend<{ context: BrowserContext; requests: string[] }>
       channel: "chromium",
       headless: true,
       viewport: { width: 1100, height: 760 },
+      deviceScaleFactor: 2,
       locale: "es-ES",
       args: [`--disable-extensions-except=${EXTENSION_PATH}`, `--load-extension=${EXTENSION_PATH}`],
     });
