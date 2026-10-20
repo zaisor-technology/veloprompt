@@ -23,12 +23,13 @@
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "coverage": "vitest run --coverage",
-    "bench": "vitest bench --run"
+    "bench": "tsup && node bench/run.mjs"
   },
   "devDependencies": {
+    "@types/node": "^22.20.5",
     "@vitest/coverage-v8": "^5.0.5",
     "tsup": "^9.0.0",
-    "typescript": "^7.0.2",
+    "typescript": "^6.0.3",
     "vitest": "^5.0.5"
   }
 }

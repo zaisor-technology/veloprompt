@@ -1,7 +1,14 @@
 {
   "extends": "../../tsconfig.base.json",
   "compilerOptions": {
-    "types": []
+    "types": [
+      "node"
+    ]
   },
-  "include": ["src", "test", "bench", "*.config.ts"]
+  "include": [
+    "src",
+    "test",
+    "bench/**/*.d.mts",
+    "*.config.ts"
+  ]
 }
