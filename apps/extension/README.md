@@ -2,12 +2,14 @@
 
 Extensión Manifest V3 para Chrome y Edge, hecha con [WXT](https://wxt.dev) sobre
 [`veloprompt-core`](../../packages/veloprompt-core). Antes de pegar o enviar un mensaje en
-**chatgpt.com** o **claude.ai**, detecta datos sensibles y te ofrece taparlos con etiquetas
+**ChatGPT, Claude, Gemini, Copilot, Perplexity o DeepSeek**, detecta datos sensibles y te ofrece taparlos con etiquetas
 (`[CEDULA_1]`, `[NIF_1]`…). En la respuesta de la IA, las etiquetas se ven con tus datos reales,
 solo en tu pantalla.
 
-- **Permisos:** `storage` y acceso únicamente a `https://chatgpt.com/*` y `https://claude.ai/*`.
-  Nada de `<all_urls>`, sin service worker y sin ninguna petición de red.
+- **Permisos:** `storage` y acceso únicamente a los dominios de esos chats (`chatgpt.com`,
+  `claude.ai`, `gemini.google.com`, `copilot.microsoft.com`, `perplexity.ai`, `chat.deepseek.com`).
+  Nada de `<all_urls>`, sin service worker y sin ninguna petición de red. La lista vive en
+  `src/lib/sites.ts` y de ahí salen el manifiesto, el adaptador y los ajustes.
 - **Memoria:** el mapa etiqueta → valor vive solo en la memoria de la pestaña, uno por conversación.
   No se guarda en `storage` y se pierde al cerrar la pestaña.
 - **En `chrome.storage.local`:** ajustes (sitios, países, tipos, términos propios) y el contador semanal.
@@ -22,7 +24,7 @@ pnpm --filter veloprompt-extension build      # genera apps/extension/dist/chrom
 1. Abre `chrome://extensions` (en Edge, `edge://extensions`).
 2. Activa **Modo de desarrollador**.
 3. Pulsa **Cargar descomprimida** y elige la carpeta `apps/extension/dist/chrome-mv3`.
-4. Fija el icono de VeloPrompt en la barra y abre chatgpt.com o claude.ai (recarga las pestañas que ya estuvieran abiertas).
+4. Fija el icono de VeloPrompt en la barra y abre cualquiera de los chats (recarga las pestañas que ya estuvieran abiertas).
 5. Copia un texto con datos de prueba, por ejemplo
    `Soy Ana, cédula 1710034065, NIF 12345678Z, correo ana@example.com`, y pégalo en el chat.
 
@@ -39,10 +41,20 @@ Tras cambiar el código: `pnpm --filter veloprompt-extension build` y el botón 
 | Enviar | Enter sin Shift en el editor y clic en el botón de enviar, en captura. Revisa el texto completo (por si escribiste datos a mano), tapa en el sitio con `execCommand("insertText")` y reenvía. |
 | Respuesta | `MutationObserver`: cuando la respuesta deja de cambiar (fin del streaming), cambia las etiquetas conocidas por el valor real con subrayado punteado y el tooltip "Dato restaurado por VeloPrompt (la IA nunca lo vio)". Añade **Copiar con datos reales**. |
 
-Para modificar el editor (ProseMirror) nunca se toca `innerText`: se usa `insertText` o un `paste`
-sintético con `DataTransfer`, de modo que el estado interno del editor se actualiza.
+Para modificar el editor nunca se toca `innerText` ni `.value`: se usa `insertText` o un `paste`
+sintético con `DataTransfer` (y, en un textarea, el setter nativo más un evento `input` como último
+recurso), de modo que el estado interno del editor se actualiza.
 
-Cada sitio tiene su adaptador en `src/adapters/` (`chatgpt.ts`, `claude.ts`) con la interfaz
+| Sitio | Editor | Adaptador |
+| --- | --- | --- |
+| ChatGPT | ProseMirror | `src/adapters/chatgpt.ts` |
+| Claude | ProseMirror | `src/adapters/claude.ts` |
+| Gemini | Quill | `src/adapters/gemini.ts` |
+| Copilot | textarea (React) | `src/adapters/copilot.ts` |
+| Perplexity | Lexical (y textarea antiguo) | `src/adapters/perplexity.ts` |
+| DeepSeek | textarea (React) | `src/adapters/deepseek.ts` |
+
+Todos se crean con `createSiteAdapter` (`src/adapters/site-adapter.ts`) y comparten la interfaz
 `getEditor()`, `getText()`, `setText()`, `onSend()`, `getResponseContainers()` (más
 `replaceRanges()`, `submit()` y `conversationKey()`).
 
@@ -54,9 +66,10 @@ pnpm --filter veloprompt-extension test:browser  # Playwright: adaptadores + E2E
 pnpm --filter veloprompt-extension screenshots   # regenera docs/capturas/*.png
 ```
 
-Los tests de navegador usan páginas locales (`tests/pages/`) que imitan el editor ProseMirror y el
-contenedor de respuestas de cada sitio. El editor falso tiene un estado interno propio y envía ese
-estado: si la extensión solo cambiara el DOM, los tests fallarían. Nunca se usan las webs reales.
+Los tests de navegador usan páginas locales (`tests/pages/`) que imitan el editor (ProseMirror,
+Quill, Lexical o textarea de React) y el contenedor de respuestas de cada uno de los 6 sitios. Cada
+editor falso tiene un estado interno propio y envía ese estado: si la extensión solo cambiara el
+DOM, los tests fallarían. Nunca se usan las webs reales.
 
 ## Capturas
 
@@ -70,11 +83,13 @@ estado: si la extensión solo cambiara el DOM, los tests fallarían. Nunca se us
 
 ## Lo que aún no funciona o no está probado
 
-- **No se ha probado en chatgpt.com ni claude.ai reales.** Los selectores (`#prompt-textarea`,
-  `#composer-submit-button`, `[data-message-author-role='assistant']`, `.font-claude-response`,
-  `button[aria-label='Send message']`…) están puestos según la estructura conocida de las webs y pueden
-  haber cambiado. Si algo no responde, el ajuste está en `src/adapters/chatgpt.ts` o `claude.ts`.
-- **Interfaz de claude.ai en otros idiomas:** el botón de enviar se busca por `aria-label` en inglés o en español.
+- **ChatGPT y Claude se han probado en las webs reales; Gemini, Copilot, Perplexity y DeepSeek
+  todavía no.** Sus selectores están puestos según la estructura conocida de cada web y pueden haber
+  cambiado. Si algo no responde, el ajuste está en el adaptador de ese sitio.
+- **Botón de enviar por `aria-label`** (Claude, Gemini, Copilot, Perplexity): se busca en inglés o en
+  español. Enter funciona en cualquier idioma.
+- **DeepSeek:** su botón de enviar no tiene etiqueta ni identificador estable; se toma el último botón
+  de la caja del mensaje. Si añaden otro botón detrás, habría que ajustarlo.
 - **Restaurar choca con React en casos raros:** si la web vuelve a dibujar una respuesta ya restaurada,
   las etiquetas reaparecen un instante hasta que el observador las vuelve a cambiar. El botón
   "Copiar con datos reales" puede desaparecer si la web rehace el contenedor.
@@ -87,4 +102,3 @@ estado: si la extensión solo cambiara el DOM, los tests fallarían. Nunca se us
 - **Sesión al cambiar de pestaña o recargar:** el mapa vive en memoria; si recargas la página,
   las respuestas antiguas ya no se restauran (es intencionado: nada se guarda en disco).
 - **Firefox:** no probado esta semana.
-- Gemini, Copilot, Perplexity y DeepSeek: semana 3.
