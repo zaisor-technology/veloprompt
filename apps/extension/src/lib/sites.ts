@@ -2,7 +2,7 @@
  * Sitios soportados. Fuente única para el manifiesto (host_permissions y content_scripts),
  * el selector de adaptador y los ajustes. Sin dependencias: lo importa también wxt.config.ts.
  */
-export type SiteId = "chatgpt" | "claude" | "gemini" | "copilot" | "perplexity" | "deepseek";
+export type SiteId = "chatgpt" | "claude" | "gemini" | "copilot" | "m365" | "perplexity" | "deepseek";
 
 export interface SiteInfo {
   id: SiteId;
@@ -15,6 +15,8 @@ export const SITES: readonly SiteInfo[] = [
   { id: "claude", name: "Claude", hosts: ["claude.ai"] },
   { id: "gemini", name: "Gemini", hosts: ["gemini.google.com"] },
   { id: "copilot", name: "Copilot", hosts: ["copilot.microsoft.com"] },
+  // Copilot de Microsoft 365 (cuentas de trabajo y personales). Solo actúa en el chat (/chat).
+  { id: "m365", name: "Microsoft 365 Copilot", hosts: ["m365.cloud.microsoft", "www.microsoft365.com"] },
   { id: "perplexity", name: "Perplexity", hosts: ["www.perplexity.ai", "perplexity.ai"] },
   { id: "deepseek", name: "DeepSeek", hosts: ["chat.deepseek.com"] },
 ];

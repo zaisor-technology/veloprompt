@@ -98,6 +98,9 @@ export function startRestorer(adapter: SiteAdapter, getMap: () => RedactionMap, 
       const restored = restoreIn(container, map);
       if (restored > 0 || container.querySelector(".vp-restored")) ensureCopyButton(container, getMap);
     }
+    // Webs cuyo HTML de respuesta no conocemos: restaurar en el resto de la página (nunca en el
+    // editor: restoreIn ignora textarea y contenteditable). Sin botón de copiar.
+    if (adapter.restoreAnywhere) restoreIn(document.body, map);
   };
 
   const schedule = (): void => {

@@ -22,4 +22,9 @@ export interface SiteAdapter {
   getResponseContainers(): HTMLElement[];
   /** Identifica la conversación actual; empieza por "new" si aún no tiene identificador. */
   conversationKey(): string;
+  /**
+   * Si es true, además de los contenedores conocidos se restauran las etiquetas en cualquier texto
+   * de la página (fuera del editor). Para webs cuyo HTML de respuesta no conocemos con certeza.
+   */
+  restoreAnywhere: boolean;
 }

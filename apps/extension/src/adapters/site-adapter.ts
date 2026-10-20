@@ -9,6 +9,10 @@ export interface SiteConfig {
   sendButtonSelectors: string[];
   /** Para webs cuyo botón de enviar no tiene un selector estable (p. ej. DeepSeek). */
   findSendButton?: (editor: HTMLElement | null) => HTMLElement | null;
+  /** Solo actúa en parte del sitio (p. ej. el chat de Microsoft 365, no Word ni Excel). */
+  isActive?: (location: Location) => boolean;
+  /** Ver SiteAdapter.restoreAnywhere. */
+  restoreAnywhere?: boolean;
   responseSelectors: string[];
   conversationKey: (location: Location) => string;
 }
@@ -23,7 +27,8 @@ function first<T extends Element>(selectors: string[], root: ParentNode = docume
 
 /** Misma mecánica para todos los sitios; cambian los selectores. */
 export function createSiteAdapter(config: SiteConfig): SiteAdapter {
-  const getEditor = (): HTMLElement | null => first<HTMLElement>(config.editorSelectors);
+  const active = (): boolean => config.isActive?.(location) ?? true;
+  const getEditor = (): HTMLElement | null => (active() ? first<HTMLElement>(config.editorSelectors) : null);
   const sendSelector = config.sendButtonSelectors.join(",");
   const getSendButton = (): HTMLElement | null =>
     (sendSelector ? first<HTMLElement>(config.sendButtonSelectors) : null) ?? config.findSendButton?.(getEditor()) ?? null;
@@ -77,6 +82,7 @@ export function createSiteAdapter(config: SiteConfig): SiteAdapter {
       el?.dispatchEvent(new KeyboardEvent("keydown", { key: "Enter", code: "Enter", bubbles: true, cancelable: true }));
     },
     getResponseContainers: () => {
+      if (!active()) return [];
       const input = getEditor();
       const found = new Set<HTMLElement>();
       for (const s of config.responseSelectors) {
@@ -91,5 +97,8 @@ export function createSiteAdapter(config: SiteConfig): SiteAdapter {
       return [...found];
     },
     conversationKey: () => config.conversationKey(location),
+    get restoreAnywhere() {
+      return (config.restoreAnywhere ?? false) && active();
+    },
   };
 }
