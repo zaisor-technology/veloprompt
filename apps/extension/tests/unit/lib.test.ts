@@ -38,15 +38,16 @@ describe("estadísticas semanales", () => {
 });
 
 describe("ajustes", () => {
-  it("por defecto: los 6 sitios activos, los 7 países y todos los tipos", () => {
+  it("por defecto: los 7 sitios activos, los 7 países y todos los tipos", () => {
     expect(sanitizeSettings(undefined)).toEqual(DEFAULT_SETTINGS);
-    expect(Object.values(DEFAULT_SETTINGS.sites)).toEqual([true, true, true, true, true, true]);
+    expect(Object.values(DEFAULT_SETTINGS.sites).every(Boolean)).toBe(true);
+    expect(Object.keys(DEFAULT_SETTINGS.sites)).toHaveLength(7);
     expect(DEFAULT_SETTINGS.countries).toHaveLength(7);
   });
 
   it("ajustes guardados en la semana 2 (solo ChatGPT y Claude): los sitios nuevos quedan activos", () => {
     const s = sanitizeSettings({ sites: { chatgpt: false, claude: true } });
-    expect(s.sites).toEqual({ chatgpt: false, claude: true, gemini: true, copilot: true, perplexity: true, deepseek: true });
+    expect(s.sites).toEqual({ chatgpt: false, claude: true, gemini: true, copilot: true, m365: true, perplexity: true, deepseek: true });
   });
 
   it("filtra valores desconocidos y conserva los válidos", () => {
@@ -131,12 +132,14 @@ describe("sesiones por conversación", () => {
 });
 
 describe("sitios y manifiesto", () => {
-  it("solo HTTPS y solo los dominios de los 6 chats, sin comodines", () => {
+  it("solo HTTPS y solo los dominios de los chats, sin comodines", () => {
     expect(MATCHES).toEqual([
       "https://chatgpt.com/*",
       "https://claude.ai/*",
       "https://gemini.google.com/*",
       "https://copilot.microsoft.com/*",
+      "https://m365.cloud.microsoft/*",
+      "https://www.microsoft365.com/*",
       "https://www.perplexity.ai/*",
       "https://perplexity.ai/*",
       "https://chat.deepseek.com/*",

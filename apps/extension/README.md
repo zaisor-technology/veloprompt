@@ -7,7 +7,9 @@ Extensión Manifest V3 para Chrome y Edge, hecha con [WXT](https://wxt.dev) sobr
 solo en tu pantalla.
 
 - **Permisos:** `storage` y acceso únicamente a los dominios de esos chats (`chatgpt.com`,
-  `claude.ai`, `gemini.google.com`, `copilot.microsoft.com`, `perplexity.ai`, `chat.deepseek.com`).
+  `claude.ai`, `gemini.google.com`, `copilot.microsoft.com`, `m365.cloud.microsoft`,
+  `www.microsoft365.com`, `perplexity.ai`, `chat.deepseek.com`). En Microsoft 365 solo actúa en el
+  chat de Copilot (`/chat`), nunca en Word, Excel, Outlook ni el resto.
   Nada de `<all_urls>`, sin service worker y sin ninguna petición de red. La lista vive en
   `src/lib/sites.ts` y de ahí salen el manifiesto, el adaptador y los ajustes.
 - **Memoria:** el mapa etiqueta → valor vive solo en la memoria de la pestaña, uno por conversación.
@@ -50,7 +52,8 @@ recurso), de modo que el estado interno del editor se actualiza.
 | ChatGPT | ProseMirror | `src/adapters/chatgpt.ts` |
 | Claude | ProseMirror | `src/adapters/claude.ts` |
 | Gemini | Quill | `src/adapters/gemini.ts` |
-| Copilot | textarea (React) | `src/adapters/copilot.ts` |
+| Copilot (copilot.microsoft.com) | textarea (React) | `src/adapters/copilot.ts` |
+| Microsoft 365 Copilot (m365.cloud.microsoft/chat) | contenteditable (selectores amplios) | `src/adapters/m365.ts` |
 | Perplexity | Lexical (y textarea antiguo) | `src/adapters/perplexity.ts` |
 | DeepSeek | textarea (React) | `src/adapters/deepseek.ts` |
 
@@ -88,6 +91,10 @@ DOM, los tests fallarían. Nunca se usan las webs reales.
   cambiado. Si algo no responde, el ajuste está en el adaptador de ese sitio.
 - **Botón de enviar por `aria-label`** (Claude, Gemini, Copilot, Perplexity): se busca en inglés o en
   español. Enter funciona en cualquier idioma.
+- **Microsoft 365 Copilot:** no conocemos su HTML con certeza. El editor y el botón de enviar se
+  buscan con selectores amplios, y las etiquetas se restauran en toda la página del chat; por eso
+  también se ven restaurados tus propios mensajes y no aparece "Copiar con datos reales". Si entras
+  en Microsoft 365 por otra página y navegas hasta Copilot sin recargar, puede que haga falta recargar.
 - **DeepSeek:** su botón de enviar no tiene etiqueta ni identificador estable; se toma el último botón
   de la caja del mensaje. Si añaden otro botón detrás, habría que ajustarlo.
 - **Restaurar choca con React en casos raros:** si la web vuelve a dibujar una respuesta ya restaurada,

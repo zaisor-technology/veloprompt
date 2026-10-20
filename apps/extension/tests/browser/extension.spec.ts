@@ -233,3 +233,28 @@ for (const site of NEW_SITES) {
     });
   });
 }
+
+test.describe("Microsoft 365 Copilot (página de prueba con HTML desconocido)", () => {
+  const M365 = { url: "/m365/chat", editor: "#editor", send: ".send" };
+
+  test("pegar → tapar → enviar → la respuesta se restaura aunque no conozcamos su contenedor", async ({ page }) => {
+    await open(page, M365);
+    await paste(page, M365.editor, "Soy Ana, cédula 1710034065, NIF 12345678Z, correo ana@example.com");
+    await expect(notice(page).locator("mark small")).toHaveText(["Cédula (EC)", "DNI/NIF (ES)", "Email"]);
+    await page.keyboard.press("Enter");
+    await expect.poll(() => editorText(page, M365.editor)).toBe("Soy Ana, cédula [CEDULA_1], NIF [NIF_1], correo [EMAIL_1]");
+    await page.locator(M365.send).click();
+    await expect.poll(() => sent(page)).toEqual(["Soy Ana, cédula [CEDULA_1], NIF [NIF_1], correo [EMAIL_1]"]);
+    await expect(page).toHaveURL(/\/m365\/chat\/conversation\/conv-m365-1$/);
+
+    await reply(page, "Hola Ana: tu cédula [CEDULA_1] y tu correo [EMAIL_1].");
+    await expect(page.locator(".fui-reply")).toHaveText("Hola Ana: tu cédula 1710034065 y tu correo ana@example.com.");
+  });
+
+  test("fuera del chat (Word, Excel…) no hace nada", async ({ page }) => {
+    await open(page, { url: "/m365/word/documento" });
+    await paste(page, M365.editor, "NIF 12345678Z");
+    await expect.poll(() => editorText(page, M365.editor)).toBe("NIF 12345678Z");
+    await expect(notice(page)).toHaveCount(0);
+  });
+});

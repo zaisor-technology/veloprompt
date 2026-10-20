@@ -145,6 +145,24 @@ test("deepseek: los interruptores DeepThink y Buscar no cuentan como enviar", as
   expect(await page.evaluate(() => (window as any).__calls)).toBe(1);
 });
 
+test("m365: solo actúa en el chat, no en el resto de Microsoft 365", async ({ page }) => {
+  await page.goto("/m365/chat");
+  await page.addScriptTag({ url: "/harness.js" });
+  expect(await page.evaluate(() => VP.m365Adapter.getEditor()?.id)).toBe("editor");
+  await page.evaluate(() => history.pushState({}, "", "/m365/word/documento"));
+  expect(await page.evaluate(() => VP.m365Adapter.getEditor())).toBeNull();
+  expect(await page.evaluate(() => VP.m365Adapter.restoreAnywhere)).toBe(false);
+});
+
+test("m365: encuentra el botón de enviar sin etiqueta (el último de la caja, no el +)", async ({ page }) => {
+  await page.goto("/m365/chat");
+  await page.addScriptTag({ url: "/harness.js" });
+  await page.locator("#editor").click();
+  await page.keyboard.type("hola");
+  await page.evaluate(() => VP.m365Adapter.submit());
+  expect(await page.evaluate(() => (window as any).__sent)).toEqual(["hola"]);
+});
+
 test("pickAdapter elige por dominio y solo usa rutas locales en modo test", async ({ page }) => {
   await page.goto("/chatgpt.html");
   await page.addScriptTag({ url: "/harness.js" });
@@ -153,6 +171,7 @@ test("pickAdapter elige por dominio y solo usa rutas locales en modo test", asyn
     VP.pickAdapter({ hostname: "claude.ai", pathname: "/new" })?.id,
     VP.pickAdapter({ hostname: "gemini.google.com", pathname: "/app" })?.id,
     VP.pickAdapter({ hostname: "copilot.microsoft.com", pathname: "/" })?.id,
+    VP.pickAdapter({ hostname: "m365.cloud.microsoft", pathname: "/chat" })?.id,
     VP.pickAdapter({ hostname: "www.perplexity.ai", pathname: "/" })?.id,
     VP.pickAdapter({ hostname: "perplexity.ai", pathname: "/" })?.id,
     VP.pickAdapter({ hostname: "chat.deepseek.com", pathname: "/" })?.id,
@@ -160,5 +179,5 @@ test("pickAdapter elige por dominio y solo usa rutas locales en modo test", asyn
     VP.pickAdapter({ hostname: "127.0.0.1", pathname: "/chatgpt.html" })?.id ?? null,
     VP.pickAdapter({ hostname: "127.0.0.1", pathname: "/claude.html" }, true)?.id,
   ]);
-  expect(ids).toEqual(["chatgpt", "claude", "gemini", "copilot", "perplexity", "perplexity", "deepseek", null, null, "claude"]);
+  expect(ids).toEqual(["chatgpt", "claude", "gemini", "copilot", "m365", "perplexity", "perplexity", "deepseek", null, null, "claude"]);
 });

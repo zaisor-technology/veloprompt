@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <title>Página de prueba · Microsoft 365 Copilot</title>
+    <style>
+      body { font: 16px/1.55 "Segoe UI", system-ui, sans-serif; margin: 0; background: #f6f5f4; color: #242424; }
+      main { max-width: 760px; margin: 0 auto; padding: 24px 16px 220px; }
+      .fui-user { background: #fff; border-radius: 14px; padding: 10px 16px; margin: 16px 0 16px auto; width: fit-content; max-width: 70%; white-space: pre-wrap; }
+      .fui-reply { margin: 16px 0; }
+      .composer { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%); width: min(760px, calc(100% - 32px)); background: #fff; border-radius: 28px; padding: 14px 60px; box-shadow: 0 2px 8px rgba(0,0,0,.08); }
+      .composer [contenteditable] { outline: none; min-height: 24px; }
+      .composer p { margin: 0; }
+      .composer button { position: absolute; bottom: 10px; width: 40px; height: 40px; border-radius: 50%; border: 0; cursor: pointer; font-size: 18px; }
+      .attach { left: 12px; background: transparent; }
+      .send { right: 12px; background: #242424; color: #fff; }
+    </style>
+    <script src="/fake-prosemirror.js"></script>
+  </head>
+  <body>
+    <main id="thread"></main>
+    <div class="composer">
+      <button class="attach" type="button" aria-label="Agregar contenido">+</button>
+      <div id="editor" aria-label="Mensaje a Copilot"></div>
+      <button class="send" type="button" title="Enviar">↑</button>
+    </div>
+    <script>
+      // Selectores desconocidos a propósito: sin data-testid ni aria-label en el botón de enviar ni
+      // en las respuestas, para probar los mecanismos de respaldo del adaptador.
+      window.__sent = [];
+      const thread = document.getElementById("thread");
+      const editor = FakeProseMirror.createEditor(document.getElementById("editor"), { onSubmit: send, flavor: "lexical" });
+      document.querySelector(".send").addEventListener("click", send);
+      function send() {
+        const text = editor.getText();
+        if (!text.trim()) return;
+        window.__sent.push(text);
+        const u = document.createElement("div");
+        u.className = "fui-user";
+        u.textContent = text;
+        thread.append(u);
+        editor.clear();
+        if (!/conversation/.test(location.pathname)) history.pushState({}, "", "/m365/chat/conversation/conv-m365-1");
+      }
+      window.__reply = async (text) => {
+        const d = document.createElement("div");
+        d.className = "fui-reply";
+        const p = document.createElement("p");
+        d.append(p);
+        thread.append(d);
+        await FakeProseMirror.streamInto(p, text);
+      };
+    </script>
+  </body>
+</html>

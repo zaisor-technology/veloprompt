@@ -15,6 +15,7 @@ const ROUTES = [
   ["/chats/", "copilot.html"],
   ["/search/", "perplexity.html"],
   ["/a/chat/s/", "deepseek.html"],
+  ["/m365/", "m365.html"],
 ];
 
 createServer(async (req, res) => {
