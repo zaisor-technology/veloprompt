@@ -64,7 +64,7 @@ function runRule(text: string, rule: Rule, out: Candidate[]): void {
       value,
       start,
       end,
-      confidence: Math.min(0.99, rule.confidence + (withContext ? 0.05 : 0)),
+      confidence: Math.round(Math.min(0.99, rule.confidence + (withContext ? 0.05 : 0)) * 100) / 100,
       rule: rule.id,
       priority: rule.priority,
       withContext,
