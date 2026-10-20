@@ -10,7 +10,7 @@ const isDigits = (s: string, len?: number): boolean =>
 
 /** Quita espacios, puntos y guiones y pasa a mayúsculas. */
 export function normalize(value: string): string {
-  return value.replace(/[\s.\-]/g, "").toUpperCase();
+  return value.replace(/[\s.-]/g, "").toUpperCase();
 }
 
 // ---------------------------------------------------------------- comunes

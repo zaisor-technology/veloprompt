@@ -47,7 +47,7 @@ function phoneCountry(value: string): FindingCountry {
 }
 
 const PHONE_CONTEXT =
-  /\b(telefono|tel|telf|tlf|tlfn|movil|celular|cel|whatsapp|whats|wsp|wa|llamar|llamame|llama|phone|fono|contacto|numero)\b/;
+  /\b(telefono|tel|telf|tlf|tlfn|movil|celular|cel|whatsapp|whats|wsp|wa|llamar|llamame|llama|phone|fono|contacto)\b/;
 
 function localPhone(id: string, country: Country, source: string, requireContext: Rule["requireContext"]): Rule {
   return {
@@ -65,11 +65,19 @@ function localPhone(id: string, country: Country, source: string, requireContext
 
 // ---------------------------------------------------------------- tarjetas
 
-const CARD_PREFIX = /^(?:4|5[1-5]|2[2-7]|3[47]|3(?:0[0-5]|[68])|6(?:011|5|4[4-9]|22)|35)/;
+/** Prefijo de emisor y longitudes válidas de cada marca. */
+const CARD_BRANDS: [RegExp, number[]][] = [
+  [/^4/, [13, 16, 19]], // Visa
+  [/^(?:5[1-5]|2(?:2[2-9]|[3-6]\d|7[01]|720))/, [16]], // Mastercard
+  [/^3[47]/, [15]], // American Express
+  [/^3(?:0[0-5]|[68])/, [14, 16, 17, 18, 19]], // Diners
+  [/^(?:6011|65|64[4-9]|622)/, [16, 17, 18, 19]], // Discover / UnionPay
+  [/^35(?:2[89]|[3-8]\d)/, [16, 17, 18, 19]], // JCB
+];
 
 function validateCard(raw: string): boolean {
   const d = raw.replace(/[\s-]/g, "");
-  return d.length >= 13 && d.length <= 19 && CARD_PREFIX.test(d) && luhn(d);
+  return CARD_BRANDS.some(([prefix, lengths]) => prefix.test(d) && lengths.includes(d.length)) && luhn(d);
 }
 
 // ---------------------------------------------------------------- reglas
