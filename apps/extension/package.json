@@ -1,0 +1,7 @@
+{
+  "name": "veloprompt-extension",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Extensión de navegador de VeloPrompt (próximamente).",
+  "license": "MIT"
+}
