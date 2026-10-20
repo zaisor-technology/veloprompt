@@ -1,11 +1,14 @@
 import * as editor from "./editor";
 import type { SiteAdapter } from "./types";
 
-export interface ProseMirrorSiteConfig {
+export interface SiteConfig {
   id: SiteAdapter["id"];
   name: string;
+  /** Primero el más específico. Puede ser contenteditable o textarea. */
   editorSelectors: string[];
   sendButtonSelectors: string[];
+  /** Para webs cuyo botón de enviar no tiene un selector estable (p. ej. DeepSeek). */
+  findSendButton?: (editor: HTMLElement | null) => HTMLElement | null;
   responseSelectors: string[];
   conversationKey: (location: Location) => string;
 }
@@ -18,11 +21,18 @@ function first<T extends Element>(selectors: string[], root: ParentNode = docume
   return null;
 }
 
-/** ChatGPT y Claude usan ProseMirror: misma mecánica, distintos selectores. */
-export function createProseMirrorAdapter(config: ProseMirrorSiteConfig): SiteAdapter {
+/** Misma mecánica para todos los sitios; cambian los selectores. */
+export function createSiteAdapter(config: SiteConfig): SiteAdapter {
   const getEditor = (): HTMLElement | null => first<HTMLElement>(config.editorSelectors);
   const sendSelector = config.sendButtonSelectors.join(",");
-  const getSendButton = (): HTMLButtonElement | null => first<HTMLButtonElement>(config.sendButtonSelectors);
+  const getSendButton = (): HTMLElement | null =>
+    (sendSelector ? first<HTMLElement>(config.sendButtonSelectors) : null) ?? config.findSendButton?.(getEditor()) ?? null;
+  const isSendTarget = (target: EventTarget | null): boolean => {
+    if (!(target instanceof Element)) return false;
+    if (sendSelector && target.closest(sendSelector)) return true;
+    const custom = config.findSendButton?.(getEditor());
+    return !!custom && custom.contains(target);
+  };
 
   return {
     id: config.id,
@@ -47,8 +57,7 @@ export function createProseMirrorAdapter(config: ProseMirrorSiteConfig): SiteAda
         if (el && e.target instanceof Node && el.contains(e.target)) cb(e);
       };
       const onClick = (e: MouseEvent): void => {
-        const target = e.target instanceof Element ? e.target.closest(sendSelector) : null;
-        if (target) cb(e);
+        if (isSendTarget(e.target)) cb(e);
       };
       window.addEventListener("keydown", onKey, true);
       window.addEventListener("click", onClick, true);
@@ -59,7 +68,8 @@ export function createProseMirrorAdapter(config: ProseMirrorSiteConfig): SiteAda
     },
     submit: () => {
       const button = getSendButton();
-      if (button && !button.disabled) {
+      const disabled = button instanceof HTMLButtonElement ? button.disabled : button?.getAttribute("aria-disabled") === "true";
+      if (button && !disabled) {
         button.click();
         return;
       }

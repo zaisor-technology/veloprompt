@@ -1,10 +1,10 @@
-import { createProseMirrorAdapter } from "./prosemirror";
+import { createSiteAdapter } from "./site-adapter";
 
 /**
  * claude.ai. Selectores revisados en octubre de 2026; si la web cambia, se ajustan aquí.
  * Conversación: /chat/<uuid>. Chat nuevo: /new.
  */
-export const claudeAdapter = createProseMirrorAdapter({
+export const claudeAdapter = createSiteAdapter({
   id: "claude",
   name: "Claude",
   editorSelectors: [

@@ -1,10 +1,10 @@
-import { createProseMirrorAdapter } from "./prosemirror";
+import { createSiteAdapter } from "./site-adapter";
 
 /**
  * chatgpt.com. Selectores revisados en octubre de 2026; si la web cambia, se ajustan aquí.
  * Conversación: /c/<id> (también dentro de un GPT: /g/<gpt>/c/<id>). Chat nuevo: "/".
  */
-export const chatgptAdapter = createProseMirrorAdapter({
+export const chatgptAdapter = createSiteAdapter({
   id: "chatgpt",
   name: "ChatGPT",
   editorSelectors: ["#prompt-textarea[contenteditable='true']", "div.ProseMirror[contenteditable='true']"],
