@@ -11,7 +11,16 @@ Todo ocurre en tu navegador: **sin servidor, sin telemetría y sin llamadas de r
 
 Web: [zaisor.io/veloprompt](https://zaisor.io/veloprompt)
 
-> Estado: semana 3. Motor de detección (`veloprompt-core`) y extensión para ChatGPT, Claude, Gemini, Copilot, Microsoft 365 Copilot, Perplexity y DeepSeek ([`apps/extension`](apps/extension/README.md)).
+> **Versión 0.1** · enviada a revisión en la Chrome Web Store (el enlace se añadirá cuando se publique).
+> Funciona en ChatGPT, Claude, Gemini, Copilot, Microsoft 365 Copilot, Perplexity y DeepSeek.
+
+## Instalar
+
+- **Chrome Web Store:** próximamente.
+- **A mano (Chrome o Edge):** descarga `veloprompt-extension-0.1.0-chrome.zip` desde
+  [Releases](https://github.com/zaisor-technology/veloprompt/releases), descomprímelo, abre
+  `chrome://extensions` (o `edge://extensions`), activa el **Modo de desarrollador**, pulsa
+  **Cargar descomprimida** y elige la carpeta descomprimida.
 
 ## Estructura
 

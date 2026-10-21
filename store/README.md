@@ -11,7 +11,7 @@ nada se publica automáticamente.
 | `imagenes/mosaico-440x280.png` | Mosaico promocional pequeño |
 | `imagenes/marquesina-1400x560.png` | Marquesina (opcional) |
 | `imagenes/logo-300x300.png` | Logo para la tienda de Edge |
-| `../apps/extension/dist/veloprompt-extension-1.0.0-chrome.zip` | Paquete (no se sube a git; ver paso 1) |
+| `../apps/extension/dist/veloprompt-extension-0.1.0-chrome.zip` | Paquete (no se sube a git; ver paso 1) |
 
 ## Antes de empezar (bloqueante)
 
@@ -26,7 +26,7 @@ nada se publica automáticamente.
 cd ~/Documents/PROYECTOS/veloprompt
 pnpm install
 pnpm --filter veloprompt-extension zip
-# → apps/extension/dist/veloprompt-extension-1.0.0-chrome.zip
+# → apps/extension/dist/veloprompt-extension-0.1.0-chrome.zip
 ```
 
 Para regenerar las imágenes: `pnpm --filter veloprompt-extension store:images`.
@@ -62,12 +62,12 @@ Para regenerar las imágenes: `pnpm --filter veloprompt-extension store:images`.
 
 ## 4. Actualizaciones
 
-1. Sube la versión en `apps/extension/package.json` (por ejemplo, 1.0.1).
+1. Sube la versión en `apps/extension/package.json` (por ejemplo, 0.1.1).
 2. `pnpm --filter veloprompt-extension zip`.
 3. En cada tienda: **Paquete → Subir nuevo paquete** → enviar a revisión.
 
 ## Pendiente de decidir
 
-- **Código abierto:** la ficha no dice «de código abierto» mientras el repositorio sea privado. Si
-  se hace público, se puede añadir a la descripción y a la marquesina, con el enlace a GitHub.
+- **Código abierto:** la descripción enlaza a https://github.com/zaisor-technology/veloprompt.
+  El repositorio tiene que ser público antes de enviar la ficha; si no, quitar esa línea.
 - **Ficha en inglés:** se puede añadir más adelante, junto con la traducción de la extensión.

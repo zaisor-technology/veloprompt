@@ -5,9 +5,9 @@ Idioma de la ficha: **Español**.
 
 ## Paquete
 
-- Archivo: `apps/extension/dist/veloprompt-extension-1.0.0-chrome.zip`
+- Archivo: `apps/extension/dist/veloprompt-extension-0.1.0-chrome.zip`
   (se genera con `pnpm --filter veloprompt-extension zip`).
-- Versión: **1.0.0**. El nombre y la descripción corta salen del manifiesto:
+- Versión: **0.1.0**. El nombre y la descripción corta salen del manifiesto:
   - Nombre: **VeloPrompt**
   - Descripción corta (máx. 132): *Ponle un velo a tus datos antes de enviarlos a la IA. Todo en local, sin servidor.*
 
@@ -37,6 +37,7 @@ ChatGPT, Claude, Gemini, Copilot, Microsoft 365 Copilot, Perplexity y DeepSeek.
 
 PRIVACIDAD DE VERDAD
 • 100 % local: sin servidor, sin cuentas, sin analítica y sin ninguna petición de red.
+• Código abierto (licencia MIT): https://github.com/zaisor-technology/veloprompt
 • Las etiquetas y tus datos reales viven solo en la memoria de la pestaña y se borran al cerrarla.
 • Solo pide acceso a los sitios de chat compatibles, nunca a «todos los sitios».
 

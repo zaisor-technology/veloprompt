@@ -1,6 +1,6 @@
 {
   "name": "veloprompt-extension",
-  "version": "1.0.0",
+  "version": "0.1.0",
   "private": true,
   "description": "Extensión de navegador de VeloPrompt: tapa datos sensibles antes de enviarlos a la IA.",
   "license": "MIT",
