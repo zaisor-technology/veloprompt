@@ -28,12 +28,12 @@ CÓMO FUNCIONA
 
 QUÉ DETECTA
 • Ecuador: cédula y RUC. España: DNI/NIF, NIE, CIF e IBAN. México: CURP, RFC y CLABE. Chile: RUT. Colombia: NIT y cédula. Perú: RUC y DNI. Argentina: CUIT/CUIL, CBU y DNI.
-• En cualquier país: emails, teléfonos, tarjetas de crédito, IBAN, claves de API (OpenAI, Anthropic, AWS, GitHub, Slack) y contraseñas.
+• En cualquier país: emails, teléfonos, tarjetas de crédito, IBAN, claves de API y contraseñas.
 • Tus propios términos: nombres de clientes, proyectos o personas que quieras tapar siempre.
 Los números se validan con su dígito o letra de control, para no confundirlos con pedidos, fechas o importes.
 
 DÓNDE FUNCIONA
-ChatGPT, Claude, Gemini, Copilot, Microsoft 365 Copilot, Perplexity y DeepSeek.
+En los principales chats de IA que se usan desde el navegador. La lista completa de sitios compatibles está en zaisor.io/veloprompt.
 
 PRIVACIDAD DE VERDAD
 • 100 % local: sin servidor, sin cuentas, sin analítica y sin ninguna petición de red.
@@ -45,6 +45,10 @@ VeloPrompt reduce el riesgo, pero no reconoce nombres de personas, direcciones n
 
 ¿Lo quieres para todo tu equipo? zaisor.io/veloprompt
 ---
+
+> Nota (rechazo «Yellow Argon», 22-10-2026): Google no admite listas de marcas en la descripción
+> ni en las imágenes. Nombrar como mucho uno o dos chats en una frase normal; la lista completa
+> va en la web, no en la ficha.
 
 - **Categoría:** Productividad → Herramientas (si aparece «Privacidad y seguridad», mejor esa).
 - **Idioma:** Español.

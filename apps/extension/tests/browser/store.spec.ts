@@ -121,7 +121,7 @@ test("imágenes de la Chrome Web Store", async ({ page, context }) => {
     [png(`${RAW}/4.png`)], [1000]));
   await compose(c, "5-local.png", 1280, 800, slide(
     "100 % local. Sin servidor, sin cuentas, sin rastreo",
-    "Funciona en ChatGPT, Claude, Gemini, Copilot, Perplexity y DeepSeek. Tú eliges países, tipos y palabras propias.",
+    "Funciona en los chats de IA más usados. Tú eliges países, tipos de dato y palabras propias.",
     [png(`${RAW}/popup.png`), png(`${RAW}/ajustes.png`)], [300, 540]));
 
   await compose(c, "mosaico-440x280.png", 440, 280, `
