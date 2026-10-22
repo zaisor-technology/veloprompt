@@ -10,7 +10,8 @@ nada se publica automáticamente.
 | `imagenes/1-…5-*.png` | 5 capturas de 1280×800 |
 | `imagenes/mosaico-440x280.png` | Mosaico promocional pequeño |
 | `imagenes/marquesina-1400x560.png` | Marquesina (opcional) |
-| `imagenes/logo-300x300.png` | Logo para la tienda de Edge |
+| `imagenes/logo-edge-300x300.png` | Logo para la tienda de Edge (escudo) |
+| `ficha-edge.md` | Todos los campos de la ficha de Edge Add-ons |
 | `../apps/extension/dist/veloprompt-extension-0.1.0-chrome.zip` | Paquete (no se sube a git; ver paso 1) |
 
 ## Antes de empezar (bloqueante)
