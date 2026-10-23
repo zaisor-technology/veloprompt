@@ -11,12 +11,12 @@ Todo ocurre en tu navegador: **sin servidor, sin telemetría y sin llamadas de r
 
 Web: [zaisor.io/veloprompt](https://zaisor.io/veloprompt)
 
-> **Versión 0.1** · enviada a revisión en la Chrome Web Store (el enlace se añadirá cuando se publique).
+> **Versión 0.1** · [disponible en la Chrome Web Store](https://chromewebstore.google.com/detail/veloprompt/mhojjikijcjkapcojipkfgebdeabaadp).
 > Funciona en ChatGPT, Claude, Gemini, Copilot, Microsoft 365 Copilot, Perplexity y DeepSeek.
 
 ## Instalar
 
-- **Chrome Web Store:** próximamente.
+- **Chrome Web Store** (recomendado, se actualiza sola): [VeloPrompt en la Chrome Web Store](https://chromewebstore.google.com/detail/veloprompt/mhojjikijcjkapcojipkfgebdeabaadp)
 - **A mano (Chrome o Edge):** descarga `veloprompt-extension-0.1.0-chrome.zip` desde
   [Releases](https://github.com/zaisor-technology/veloprompt/releases), descomprímelo, abre
   `chrome://extensions` (o `edge://extensions`), activa el **Modo de desarrollador**, pulsa
