@@ -28,7 +28,7 @@ const CSS = `
 }
 @keyframes in { from { opacity: 0; transform: translateY(6px); } }
 header { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
-header svg { flex: none; color: var(--accent); }
+header svg { flex: none; }
 h2 { font-size: 14px; font-weight: 650; margin: 0; }
 .preview { background: var(--soft); border-radius: 10px; padding: 8px 10px; white-space: pre-wrap;
   word-break: break-word; max-height: 140px; overflow: auto; font-size: 13px; color: var(--muted); }
@@ -52,9 +52,11 @@ li input { accent-color: var(--accent); }
 [hidden] { display: none !important; }
 `;
 
-const ICON = `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-<path d="M4 7c3-3 13-3 16 0v4c0 5-3.5 8.5-8 10-4.5-1.5-8-5-8-10V7z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>
-<path d="M8 11c2.3 1.6 5.7 1.6 8 0" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>`;
+const ICON = `<svg width="22" height="22" viewBox="0 0 128 128" aria-hidden="true">
+<defs><linearGradient id="vp-g" x1="0.15" y1="0.1" x2="0.85" y2="0.95"><stop offset="0" stop-color="#8268f6"/><stop offset="1" stop-color="#46acf7"/></linearGradient></defs>
+<path d="M64 17.5 L101 29.5 V64 C101 86 86 101.5 64 111 C42 101.5 27 86 27 64 V29.5 Z" fill="url(#vp-g)" stroke="url(#vp-g)" stroke-width="3" stroke-linejoin="round"/>
+<path d="M42 62 Q64 39.5 86 62" fill="none" stroke="#fff" stroke-width="7" stroke-linecap="round"/>
+<path d="M45 75 H83" stroke="#fff" stroke-opacity="0.8" stroke-width="7.5" stroke-linecap="round"/></svg>`;
 
 let closeCurrent: ((c: NoticeChoice) => void) | null = null;
 

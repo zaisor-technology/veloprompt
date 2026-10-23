@@ -5,6 +5,7 @@ import { countriesSection, h, sitesSection, statsSection, teamLink } from "../..
 import type { Settings, SiteId } from "../../lib/settings";
 import { siteForHost } from "../../lib/sites";
 import { loadSettings, loadStats, saveSettings, watchStats } from "../../lib/storage";
+import { REVIEWS_URL } from "../../lib/links";
 import type { WeeklyStats } from "../../lib/stats";
 
 const app = document.getElementById("app")!;
@@ -37,12 +38,15 @@ function render(): void {
   );
   const more = h("button", { type: "button" }, "Tipos y términos propios…");
   more.addEventListener("click", () => void browser.runtime.openOptionsPage());
+  const help = h("a", { href: "/bienvenida.html", target: "_blank" }, "Cómo funciona");
+  const rate = h("a", { href: REVIEWS_URL, target: "_blank", rel: "noopener" }, "★ Valórala en la Chrome Web Store");
+  const small = h("p", { className: "muted links" }, help, " · ", rate);
   app.replaceChildren(
     header,
     statsSection(stats),
     sitesSection(settings, update, site),
     countriesSection(settings, update),
-    h("section", { className: "footer" }, more, teamLink()),
+    h("section", { className: "footer" }, more, teamLink(), small),
   );
 }
 

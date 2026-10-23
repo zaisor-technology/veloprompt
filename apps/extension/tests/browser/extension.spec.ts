@@ -258,3 +258,16 @@ test.describe("Microsoft 365 Copilot (página de prueba con HTML desconocido)", 
     await expect(notice(page)).toHaveCount(0);
   });
 });
+
+test.describe("Bienvenida", () => {
+  test("se abre sola al instalar y la demo detecta los datos sin salir de la página", async ({ context }) => {
+    const welcome =
+      context.pages().find((p) => p.url().endsWith("/bienvenida.html")) ??
+      (await context.waitForEvent("page", { predicate: (p) => p.url().endsWith("/bienvenida.html"), timeout: 10_000 }));
+    await expect(welcome.getByRole("heading", { name: "VeloPrompt ya está protegiendo tus chats" })).toBeVisible();
+    await expect(welcome.locator(".result mark")).toHaveCount(4);
+    await expect(welcome.locator(".veiled")).toContainText("[CEDULA_1]");
+    await welcome.getByLabel("Texto de prueba").fill("Sin datos aquí");
+    await expect(welcome.locator(".veiled")).toHaveText("No hay datos sensibles en este texto.");
+  });
+});
