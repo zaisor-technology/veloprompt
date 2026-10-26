@@ -1,7 +1,7 @@
 # Ficha de VeloPrompt en Microsoft Edge Add-ons
 
 Panel: https://partner.microsoft.com/dashboard/microsoftedge/overview (registro gratuito).
-Se sube **el mismo ZIP** que en Chrome: `apps/extension/dist/veloprompt-extension-0.1.0-chrome.zip`.
+Se sube **el mismo ZIP** que en Chrome: `apps/extension/dist/veloprompt-extension-0.1.1-chrome.zip`.
 
 ## 1. Registro (solo la primera vez)
 
